@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   PlusCircle,
   Trash2,
@@ -17,37 +17,46 @@ import {
   Upload,
   Zap,
 } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { Textarea } from "../components/ui/textarea";
-import { ThemeProvider } from "../components/theme-provider";
-import "../styles/globals.css";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Rule } from "../shared/types/rules";
+import { useRules } from "../shared/hooks/useRules";
+import { isMobile, generateId } from "../shared/utils/helpers";
+import "@/styles/globals.css";
 
 // Set page title
-document.title = "Interzept - API Request Interceptor";
+document.title = "Interzept Options - API Request Interceptor";
 
-// Types
-interface Rule {
-  id: string;
-  name: string;
-  type: "overrides" | "redirect" | "headers";
-  enabled: boolean;
-  source: string;
-  destination?: string;
-  responseBody?: string;
-  responseCode?: number;
-  responseHeaders?: { name: string; value: string }[];
-  headers?: { name: string; value: string; operation: string }[];
-  description?: string;
+// Environment detection and Chrome API handling
+declare global {
+  interface Window {
+    chrome?: any;
+  }
 }
 
-// Utility functions
-const isMobile = () => {
-  if (typeof window === "undefined") return false;
-  return (
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-    window.innerWidth < 768
-  );
+const isExtensionEnvironment = () => {
+  return typeof window !== 'undefined' && 
+         typeof window.chrome !== 'undefined' && 
+         window.chrome.runtime && 
+         window.chrome.runtime.id;
 };
+
+// Mock chrome APIs for standalone development
+const mockChrome = {
+  storage: {
+    local: {
+      get: (keys: any) => Promise.resolve({}),
+      set: (items: any) => Promise.resolve(),
+    }
+  },
+  runtime: {
+    sendMessage: (message: any) => Promise.resolve(),
+  }
+};
+
+// Use real chrome API in extension, mock in standalone
+const chromeAPI = isExtensionEnvironment() ? window.chrome : mockChrome;
 
 // Rule Templates
 const ruleTemplates = {
@@ -364,22 +373,20 @@ export default function App() {
                 <div className="flex items-center gap-3">
                   <img src="/icons/icon128.png" alt="Interzept" className="h-8 w-8" />
                   <span className="text-xl font-bold text-slate-100">Interzept</span>
-                </div>
-
-                {/* Search */}
+                </div>                {/* Search */}
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <Input
                     placeholder="Search rules..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-80 bg-slate-700 border-slate-600 pl-10 text-slate-100 placeholder:text-slate-400 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    className="pl-10 bg-slate-700 border-slate-600 text-slate-100 focus:border-cyan-400 focus:ring-cyan-400/20"
                   />
                 </div>
               </div>
 
+              {/* Import/Export */}
               <div className="flex items-center gap-3">
-                {/* Import/Export */}
                 <Button
                   variant="outline"
                   onClick={exportRules}
