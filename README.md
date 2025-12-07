@@ -143,15 +143,7 @@ Root files:
 
 ## 📄 License
 
-MIT
-
-## 💖 Credits
-
-Built with ❤️ for developers who need to test across multiple environments simultaneously.
-
-Check out other Interzept projects:
-
-- **[interzept-environment-selector](https://github.com/interzept/interzept-environment-selector)** - Multi-environment data source selector with feature flags and production safety. Perfect for testing and debugging across multiple environments simultaneously.
+MIT License - see LICENSE file for details
 
 ## 🙏 Acknowledgments
 
