@@ -29,7 +29,8 @@ const filesToCopy = [
   { src: 'popup.html', dest: 'dist/popup.html' },
   { src: 'popup.js', dest: 'dist/popup.js' },
   { src: 'background.js', dest: 'dist/background.js' },
-  { src: 'content.js', dest: 'dist/content.js' }
+  { src: 'content.js', dest: 'dist/content.js' },
+  { src: 'inject.js', dest: 'dist/inject.js' }
 ];
 
 // Copy icon files

@@ -9,7 +9,7 @@ Interzept is the ultimate tool for developers to mock, modify, and override API 
 - **🔧 API Interception**: Mock, modify, and override HTTP requests
 - **📊 Request Monitoring**: Real-time tracking of intercepted calls
 - **🎯 Rule Management**: Create, edit, and organize interception rules
-- **💾 Persistent Storage**: Chrome sync storage for rules and settings
+- **💾 Persistent Storage**: rules and settings are kept in Chrome local storage on this device
 - **🔄 CORS Bypass**: Handle cross-origin request restrictions
 - **📱 Responsive Design**: Modern UI with Tailwind CSS
 
@@ -108,7 +108,7 @@ Root files:
 - **Mock**: Create fake API endpoints
 
 ### Storage:
-- Rules are stored in Chrome sync storage
+- Rules are stored in Chrome local storage (`chrome.storage.local`); they do not sync between browsers
 - Settings persist across Chrome sessions
 - Automatic backup and restore
 

@@ -4,8 +4,11 @@ let extensionEnabled = true;
 // Initialize extension state on load
 document.addEventListener('DOMContentLoaded', function() {
     // Load saved state (default to enabled)
-    extensionEnabled = true;
     updateUI();
+    chrome.storage.local.get('interzept-enabled').then((data) => {
+        extensionEnabled = data['interzept-enabled'] !== false;
+        updateUI();
+    });
     updateVersion();
     loadDynamicIcon();
     
@@ -32,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function toggleExtension() {
     extensionEnabled = !extensionEnabled;
+    chrome.storage.local.set({ 'interzept-enabled': extensionEnabled });
     updateUI();
 }
 
