@@ -1,25 +1,28 @@
-// Content script for Interzept Chrome Extension
-console.log('Interzept content script loaded');
+// Content script (isolated world). Sends the enabled response-override rules to
+// inject.js, which runs in the page itself and wraps fetch and XMLHttpRequest.
 
-// This content script can be used to inject functionality into web pages
-// For now, it's just a placeholder for future API interception features
+const RULES_KEY = 'interzept-rules';
+const ENABLED_KEY = 'interzept-enabled';
 
-// Example: Listen for messages from the extension
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('Content script received message:', request);
-  
-  switch (request.action) {
-    case 'interceptRequests':
-      console.log('Request interception enabled');
-      // Future: Add request interception logic here
-      break;
-    case 'stopInterception':
-      console.log('Request interception disabled');
-      // Future: Stop request interception
-      break;
-    default:
-      console.log('Unknown action:', request.action);
+function publish(data) {
+  const enabled = data[ENABLED_KEY] !== false;
+  const rules = Array.isArray(data[RULES_KEY]) ? data[RULES_KEY] : [];
+  const overrides = enabled
+    ? rules
+        .filter((r) => r && r.enabled && r.type === 'overrides' && r.source && r.source.trim())
+        .map((r) => ({
+          source: r.source.trim(),
+          status: Number(r.responseCode) || 200,
+          body: r.responseBody || '',
+          headers: r.responseHeaders || [],
+        }))
+    : [];
+  window.postMessage({ __interzept: 'rules', overrides }, '*');
+}
+
+chrome.storage.local.get([RULES_KEY, ENABLED_KEY]).then(publish);
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && (changes[RULES_KEY] || changes[ENABLED_KEY])) {
+    chrome.storage.local.get([RULES_KEY, ENABLED_KEY]).then(publish);
   }
-  
-  sendResponse({ success: true });
 });
